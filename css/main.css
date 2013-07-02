@@ -1,0 +1,10 @@
+html, body { margin:0; padding:0; overflow:hidden }
+svg#map { position:fixed; top:0; bottom:0; left:0; right:0 }
+line.solar { stroke: #000000; }
+line.region { stroke: #FF0000; }
+circle.fountain { stroke: #00FF00; fill: #FFF; }
+circle.delve { stroke: #0000FF; fill: #FFF; }
+circle:hover { stroke: #FF0000; fill: #FF0000; }
+line:hover { stroke: #FF0000; }
+
+div#tools { position: absolute; top: 10px; left: 10px;}

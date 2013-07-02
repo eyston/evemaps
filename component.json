@@ -1,0 +1,10 @@
+{
+  "name": "evemaps",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "~1.0.7",
+    "d3": "~3.2.2",
+    "underscore": "~1.4.4",
+    "rxjs": "~2.1.2"
+  }
+}
