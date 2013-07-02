@@ -77,6 +77,7 @@
         .enter()
             .append('line')
             .attr('class', 'region')
+            .attr('vector-effect', 'non-scaling-stroke')
             .attr('x1', function(d) { return x(d.to.x); })
             .attr('y1', function(d) { return z(d.to.z); })
             .attr('x2', function(d) { return x(d.from.x); })
@@ -87,6 +88,7 @@
         .enter()
             .append('line')
             .attr('class', 'solar')
+            .attr('vector-effect', 'non-scaling-stroke')
             .attr('x1', function(d) { return x(d.to.x); })
             .attr('y1', function(d) { return z(d.to.z); })
             .attr('x2', function(d) { return x(d.from.x); })
@@ -101,16 +103,16 @@
 
     var colors = d3.scale.category10();
 
-    map.selectAll('circle')
-        .data(systems)
-        .enter()
-            .append('circle')
-            .attr('class', function(d) { return regionNames[d.regionId]; })
-            .attr('cx', function(d) { return x(d.x); })
-            .attr('cy', function(d) { return z(d.z); })
-            .attr('r', 1)
-            .attr('stroke', function(d) { return colors(d.regionId); })
-            .attr('fill', '#FFF');
+    // map.selectAll('circle')
+    //     .data(systems)
+    //     .enter()
+    //         .append('circle')
+    //         .attr('class', function(d) { return regionNames[d.regionId]; })
+    //         .attr('cx', function(d) { return x(d.x); })
+    //         .attr('cy', function(d) { return z(d.z); })
+    //         .attr('r', 1)
+    //         .attr('stroke', function(d) { return colors(d.regionId); })
+    //         .attr('fill', '#FFF');
 
 
 
@@ -162,8 +164,8 @@
 
         d3.select('svg g').transition().duration(duration).attr('transform',  transform(pos, scale));
 
-        circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
-        lines.attr('stroke-width', 1 / scale);
+        // circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
+        // lines.attr('stroke-width', 1 / scale);
     }
 
     var zoomOut = function() {
@@ -175,8 +177,8 @@
 
         d3.select('svg g').transition().duration(duration).attr('transform',  transform(pos, scale));
 
-        circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
-        lines.attr('stroke-width', 1 / scale);
+        // circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
+        // lines.attr('stroke-width', 1 / scale);
     }
 
     d3.select('svg').on('dblclick', zoomIn);
