@@ -73,39 +73,39 @@
         .append('g')
         .attr('transform', 'translate(50, 50)');
 
-    map.append('g').selectAll('line')
-        .data(regionJumps)
-        .enter()
-            .append('line')
-            .attr('class', 'region')
-            // .attr('vector-effect', 'non-scaling-stroke')
-            .attr('x1', function(d) { return x(d.to.x); })
-            .attr('y1', function(d) { return z(d.to.z); })
-            .attr('x2', function(d) { return x(d.from.x); })
-            .attr('y2', function(d) { return z(d.from.z); });
+    // map.append('g').selectAll('line')
+    //     .data(regionJumps)
+    //     .enter()
+    //         .append('line')
+    //         .attr('class', 'region')
+    //         // .attr('vector-effect', 'non-scaling-stroke')
+    //         .attr('x1', function(d) { return x(d.to.x); })
+    //         .attr('y1', function(d) { return z(d.to.z); })
+    //         .attr('x2', function(d) { return x(d.from.x); })
+    //         .attr('y2', function(d) { return z(d.from.z); });
 
-    // map.append('g')
-    //     .append('path')
-    //     .attr('stroke', '#F00')
-    //     .attr('d', 'M' + _(regionJumps).map(function(d) { return x(d.from.x) + "," + z(d.from.z) + "L" + x(d.to.x) + "," + z(d.to.z); }).join('M'))
+    map.append('g')
+        .append('path')
+        .attr('stroke', '#F00')
+        .attr('d', 'M' + _(regionJumps).map(function(d) { return x(d.from.x) + "," + z(d.from.z) + "L" + x(d.to.x) + "," + z(d.to.z); }).join('M'))
 
 
     // link.attr("d", "M" + graph.links.map(function(d) { return d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y; }).join("M"));
-    // map.append('g')
-    //     .append('path')
-    //     .attr('stroke', '#000')
-    //     .attr('d', 'M' + _(jumps).map(function(d) { return x(d.from.x) + "," + z(d.from.z) + "L" + x(d.to.x) + "," + z(d.to.z); }).join('M'))
+    map.append('g')
+        .append('path')
+        .attr('stroke', '#000')
+        .attr('d', 'M' + _(jumps).map(function(d) { return x(d.from.x) + "," + z(d.from.z) + "L" + x(d.to.x) + "," + z(d.to.z); }).join('M'))
 
-    map.append('g').selectAll('line')
-        .data(jumps)
-        .enter()
-            .append('line')
-            .attr('class', 'solar')
-            // .attr('vector-effect', 'non-scaling-stroke')
-            .attr('x1', function(d) { return x(d.to.x); })
-            .attr('y1', function(d) { return z(d.to.z); })
-            .attr('x2', function(d) { return x(d.from.x); })
-            .attr('y2', function(d) { return z(d.from.z); });
+    // map.append('g').selectAll('line')
+    //     .data(jumps)
+    //     .enter()
+    //         .append('line')
+    //         .attr('class', 'solar')
+    //         // .attr('vector-effect', 'non-scaling-stroke')
+    //         .attr('x1', function(d) { return x(d.to.x); })
+    //         .attr('y1', function(d) { return z(d.to.z); })
+    //         .attr('x2', function(d) { return x(d.from.x); })
+    //         .attr('y2', function(d) { return z(d.from.z); });
 
 
     regionNames = {
@@ -182,7 +182,7 @@
 
         // circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
         // lines.attr('stroke-width', 1 / scale);
-        // paths.attr('stroke-width', 1 / scale);
+        paths.attr('stroke-width', 1 / scale);
     }
 
     var zoomOut = function() {
@@ -198,7 +198,7 @@
 
         // circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
         // lines.attr('stroke-width', 1 / scale);
-        // paths.attr('stroke-width', 1 / scale);
+        paths.attr('stroke-width', 1 / scale);
     }
 
     d3.select('svg').on('dblclick', zoomIn);

@@ -8,3 +8,9 @@ circle:hover { stroke: #FF0000; fill: #FF0000; }
 line:hover { stroke: #FF0000; }
 
 div#tools { position: absolute; top: 10px; left: 10px;}
+
+.zoom2 line { stroke-width: 0.5; }
+.zoom4 line { stroke-width: 0.25; }
+.zoom8 line { stroke-width: 0.125; }
+.zoom16 line { stroke-width: 0.1; }
+.zoom32 line { stroke-width: 0.1; }
