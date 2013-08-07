@@ -1,16 +1,9 @@
 (function(window) {
 
-    var start, end;
-    console.log('start', start = new Date().getTime());
-
-    var height = window.innerHeight;
-    var width = window.innerWidth;
-
     var visibleSystems = {};
     var showSystem = function(s) {
-        if (s.regionId >   10000070) return false;
+        if (s.regionId > 10000070) return false;
         if (_([10000004, 10000017, 10000019]).contains(s.regionId)) return false;
-        // if (s.regionId === 10000001) return false;
 
         visibleSystems[s.id] = s;
         return true;
@@ -53,174 +46,213 @@
     var minX = _(systems).min(function(s) { return s.x; }).x;
     var maxX = _(systems).max(function(s) { return s.x; }).x;
     var deltaX = maxX - minX;
+    var midX = minX + deltaX / 2;
 
     var minZ = _(systems).min(function(s) { return s.z; }).z;
     var maxZ = _(systems).max(function(s) { return s.z; }).z;
     var deltaZ = maxZ - minZ;
+    var midZ = minZ + deltaZ / 2;
 
-    var screenRatio = width / height;
-    var mapRatio = deltaX / deltaZ;
+    var aspectRatio = deltaX / deltaZ;
+    var height = 500;
+    var width = height * aspectRatio;
 
     var x = d3.scale.linear()
         .domain([minX, maxX])
-        .range([0, (height - 100) * mapRatio]);
+        .range([0, height * aspectRatio]);
 
     var z = d3.scale.linear()
         .domain([maxZ, minZ])
-        .range([0, height - 100]);
+        .range([0, height]);
 
     var map = d3.select('svg#map')
-        .append('g')
-        .attr('transform', 'translate(50, 50)');
+        .append('g');
 
     map.append('g').selectAll('line')
         .data(regionJumps)
         .enter()
             .append('line')
             .attr('class', 'region')
-            // .attr('vector-effect', 'non-scaling-stroke')
             .attr('x1', function(d) { return x(d.to.x); })
             .attr('y1', function(d) { return z(d.to.z); })
             .attr('x2', function(d) { return x(d.from.x); })
             .attr('y2', function(d) { return z(d.from.z); });
-
-    // map.append('g')
-    //     .append('path')
-    //     .attr('stroke', '#F00')
-    //     .attr('d', 'M' + _(regionJumps).map(function(d) { return x(d.from.x) + "," + z(d.from.z) + "L" + x(d.to.x) + "," + z(d.to.z); }).join('M'))
-
-
-    // link.attr("d", "M" + graph.links.map(function(d) { return d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y; }).join("M"));
-    // map.append('g')
-    //     .append('path')
-    //     .attr('stroke', '#000')
-    //     .attr('d', 'M' + _(jumps).map(function(d) { return x(d.from.x) + "," + z(d.from.z) + "L" + x(d.to.x) + "," + z(d.to.z); }).join('M'))
 
     map.append('g').selectAll('line')
         .data(jumps)
         .enter()
             .append('line')
             .attr('class', 'solar')
-            // .attr('vector-effect', 'non-scaling-stroke')
             .attr('x1', function(d) { return x(d.to.x); })
             .attr('y1', function(d) { return z(d.to.z); })
             .attr('x2', function(d) { return x(d.from.x); })
             .attr('y2', function(d) { return z(d.from.z); });
 
-
-    regionNames = {
-        10000060: 'delve',
-        10000058: 'fountain',
-        10000054: 'aridia'
-    };
-
     var colors = d3.scale.category10();
 
-    // map.selectAll('circle')
-    //     .data(systems)
-    //     .enter()
-    //         .append('circle')
-    //         .attr('class', function(d) { return regionNames[d.regionId]; })
-    //         .attr('cx', function(d) { return x(d.x); })
-    //         .attr('cy', function(d) { return z(d.z); })
-    //         .attr('r', 1)
-    //         .attr('stroke', function(d) { return colors(d.regionId); })
-    //         .attr('fill', '#FFF');
+    var systemTree = new RTree();
+    _(systems).each(function(s) {
+        var length = 4000000000000;
 
+        var minX = s.x - length;
+        var maxX = s.x + length;
+        var minZ = s.z - length;
+        var maxZ = s.z + length;
 
-
-    console.log('end', end = new Date().getTime());
-    console.log('time', end - start);
-
-    console.log('elements', regionJumps.length, jumps.length, systems.length);
-
-    var scale = 1;
-    var pos = [50, 50];
-
-    var last = null;
-
-    var transform = function(pos, scale) {
-        return 'translate(' + pos[0] + ', ' + pos[1] + ')scale(' + scale + ')';
-    };
-
-    var mousedown = false;
-
-    d3.select('svg').on('mousedown', function(d, i) {
-        mousedown = true;
-        last = [d3.event.x, d3.event.y];
+        systemTree.insert({
+            x: minX,
+            y: minZ,
+            w: maxX - minX,
+            h: maxZ - minZ
+        }, s);
     });
 
-    d3.select('svg').on('mouseup', function(d, i) {
-        mousedown = false;
-    });
+    var sh = window.innerHeight;
+    var sw = window.innerWidth;
 
-    d3.select('svg').on('mousemove', function(d, i) {
-        if (!mousedown) return;
+    var zoom = d3.behavior.zoom()
+        .scaleExtent([1, 128])
+        .translate([sw / 2 - width/2, sh / 2 - height/2])
+        .scale(1)
+        .on("zoom", zoomed);
 
-        if (last) {
-            pos[0] = pos[0] + d3.event.x - last[0];
-            pos[1] = pos[1] + d3.event.y - last[1];
-            d3.select('svg g').attr('transform',  transform(pos, scale));
+    d3.select('svg g')
+        .attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
+
+    d3.select('svg').call(zoom);
+
+    var scale = zoom.scale();
+
+    function zoomed() {
+        var eventType;
+
+        if(d3.event) {
+            eventType = d3.event.sourceEvent.type;
         }
-        last = [d3.event.x, d3.event.y];
-    });
 
-    var lines = map.selectAll('line');
-    var circles = map.selectAll('circle');
-    var paths = map.selectAll('path');
 
-    var zoomIn = function() {
-        scale = scale * 2;
-        pos[0] = pos[0] * 2;
-        pos[1] = pos[1] * 2;
+        console.log('translate', zoom.translate(), 'scale', zoom.scale());
 
-        var duration = 200;
 
-        d3.select('svg').attr('class', 'zoom' + scale);
+        if (eventType === "dblclick") {
+            d3.select('svg g')
+                .transition()
+                .attr('transform', 'translate(' + zoom.translate()[0] + ', ' + zoom.translate()[1] + ')scale(' + zoom.scale() + ')');
+        } else {
+            d3.select('svg g')
+                .attr('transform', 'translate(' + zoom.translate()[0] + ', ' + zoom.translate()[1] + ')scale(' + zoom.scale() + ')');
+        }
 
-        d3.select('svg g').transition().duration(duration).attr('transform',  transform(pos, scale));
 
-        // circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
-        // lines.attr('stroke-width', 1 / scale);
-        // paths.attr('stroke-width', 1 / scale);
+        updateMap();
     }
 
-    var zoomOut = function() {
-        scale = scale / 2;
-        pos[0] = pos[0] / 2;
-        pos[1] = pos[1] / 2;
+    function updateMap() {
+        var currentScale = zoom.scale() | 0;
 
-        var duration = 200;
+        if(scale !== currentScale)
+        {
+            scale = currentScale;
+            d3.select('svg g').attr('class', 'zoom' + Math.pow(2, ((Math.log(scale)/Math.log(2)) | 0)));
+        }
 
-        d3.select('svg').attr('class', 'zoom' + scale);
+        var bounds = {
+            x: x.invert((0 - zoom.translate()[0]) / zoom.scale()),
+            y: z.invert((sh - zoom.translate()[1]) / zoom.scale()),
+            w: (x.invert(sw) - x.invert(0)) / zoom.scale(),
+            h: (z.invert(0) - z.invert(sh)) / zoom.scale()
+        };
 
-        d3.select('svg g').transition().duration(duration).attr('transform',  transform(pos, scale));
+        console.log('bounds', bounds);
 
-        // circles.attr('r', 4 / scale).attr('stroke-width', 2 / scale);
-        // lines.attr('stroke-width', 1 / scale);
-        // paths.attr('stroke-width', 1 / scale);
+        if(scale > 8) {
+
+            var ss = map.selectAll('circle')
+                .data(systemTree.search(bounds), function(s) {
+                    return s.id;
+                });
+
+            // ss.attr('r', 0.2)
+            //     .style('stroke-width', '0.2')
+
+            ss.enter()
+                .append('circle')
+                .attr('cx', function(d) { return x(d.x); })
+                .attr('cy', function(d) { return z(d.z); })
+                .attr('r', .15)
+                .style('stroke-width', '0.05')
+                .style('stroke', function(d) { return colors(d.regionId); })
+                .style('fill', '#FFF');
+
+            ss.exit()
+                .remove();
+
+        } else {
+            map.selectAll('circle').remove();
+        }
+
+        if(scale > 16) {
+            var ss = map.selectAll('text')
+                .data(systemTree.search(bounds), function(s) {
+                    return s.id;
+                });
+
+            ss.enter()
+                .append('text')
+                .attr('x', function(d) { return x(d.x); })
+                .attr('y', function(d) { return z(d.z); })
+                .attr('dy', '0.175em')
+                .attr('dx', .5)
+                .style({
+                    'font-family': 'helvetica, arial',
+                    'font-size': '0.5px'
+                })
+                .text(function(d) { return d.name; });
+
+            ss.exit()
+                .remove();
+
+        } else {
+            map.selectAll('text').remove();
+        }
     }
 
-    d3.select('svg').on('dblclick', zoomIn);
-    d3.select('#zoom-in').on('click', zoomIn);
-    d3.select('#zoom-out').on('click', zoomOut);
+    function zoomSystem(systemName) {
 
-    var rights = new Rx.Subject();
+        var system = _(systems).find(function(s) { return s.name === systemName; });
 
-    d3.select('svg').on('contextmenu', function() {
-        rights.onNext([d3.event.x, d3.event.y]);
-        d3.event.preventDefault();
+        if(!system) return;
+
+        var sh = window.innerHeight;
+        var sw = window.innerWidth;
+
+        var height = 13896860379771180;
+        var width = height * (sw / sh);
+
+        var scale = (z.invert(0) - z.invert(sh)) / height;
+
+        var transform = {
+            scale: scale,
+            x: -x(system.x - width / 2) * scale,
+            y: sh - z(system.z - height / 2) * scale
+        };
+
+        d3.transition().duration(2000).tween("zoom", function() {
+
+            var ix = d3.interpolate(zoom.translate()[0], transform.x),
+                iy = d3.interpolate(zoom.translate()[1], transform.y)
+                is = d3.interpolate(zoom.scale(), transform.scale);
+
+            return function(t) {
+                zoom.translate([ix(t), iy(t)]);
+                zoom.scale(is(t));
+                zoomed();
+            };
+        });
+    }
+
+    d3.select('#zoom-jita').on('click', function() {
+        zoomSystem("Amarr");
     });
-
-    var rightDoubles = rights
-        .timeInterval()
-        .skip(1)
-        .where(function(d) { return d.interval < 250; })
-        .select(function(d) { return d.value; })
-        .take(1)
-        .repeat();
-
-    rightDoubles.subscribe(function() { zoomOut(); });
-    rightDoubles.subscribe(function(d) { console.log('right double!', d); });
 
 })(window);
