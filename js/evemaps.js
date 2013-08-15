@@ -297,6 +297,16 @@ angular.module('evemaps').controller('MapController', ['$scope', 'MapsService', 
         };
     };
 
+    $scope.randomSystem = function() {
+        var system = mapsService.systems[Math.floor(Math.random()*mapsService.systems.length)];
+
+        $scope.term = system.name;
+        $scope.mapMode = {
+            type: "zoom",
+            target: system
+        };
+    };
+
 }]);
 
 angular.module('evemaps').directive('typeahead', ["$timeout", function($timeout) {
