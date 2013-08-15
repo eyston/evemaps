@@ -12,27 +12,30 @@
 
         <link rel="stylesheet" href="/css/main.css">
     </head>
-    <body>
+    <body ng-controller="MapController">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-        <svg id="map" ng-controller="MapController">
-            <g transform="translate(50, 50)">
+        <evemap id="map" mode="mapMode"></evemap>
 
-            <line class="solar" ng-repeat="jump in jumps"  ng-x1="{{x(jump.from.x)}}" ng-y1="{{z(jump.from.z)}}" ng-x2="{{x(jump.to.x)}}" ng-y2="{{z(jump.to.z)}}" />
-            <line class="region" ng-repeat="jump in regionJumps"  ng-x1="{{x(jump.from.x)}}" ng-y1="{{z(jump.from.z)}}" ng-x2="{{x(jump.to.x)}}" ng-y2="{{z(jump.to.z)}}" />
+        <div id="tools">
+            <typeahead class="search" items="systems" term="term" search="searchSystems(term)" select="selectSystem(item)">
+                <ul ng-cloak>
+                    <li ng-repeat="system in systems" typeahead-item="system" class="results">
+                        {{system.name}}
+                    </li>
+                </ul>
+            </typeahead>
+        </div>
 
-            <circle ng-repeat="system in systems"  ng-cx="{{x(system.x)}}" ng-cy="{{z(system.z)}}" r="2" class="{{regionNames[system.regionId]}}" />
-
-            </g>
-        </svg>
-
-        <script src="/components/angular/angular.js"></script>
-        <script src="/components/underscore/underscore.js"></script>
-        <script src="/components/d3/d3.js"></script>
-        <script src="/js/jumps.js"></script>
-        <script src="/js/systems.js"></script>
-        <script src="/js/evemaps.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="js/vendor/angular.js"></script>
+        <script src="js/vendor/underscore.js"></script>
+        <script src="js/vendor/d3.js"></script>
+        <script src="js/vendor/rtree.js"></script>
+        <script src="js/jumps.js"></script>
+        <script src="js/systems.js"></script>
+        <script src="js/evemaps.js"></script>
     </body>
 </html>

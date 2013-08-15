@@ -5,6 +5,32 @@ line.region { stroke: #FF0000; }
 
 div#tools { position: absolute; top: 10px; left: 10px;}
 
+div#tools .search input[type=text] {
+    font-size: 32px;
+    line-height: 36px;
+    height: 40px;
+    width: 500px;
+}
+
+div#tools .search ul {
+    background-color: #FFF;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+div#tools .search .results {
+    width: 375px;
+    text-align: left;
+    padding: 5px;
+    font-size: 24px;
+}
+
+div#tools .search .results.active {
+    background-color: rgb(46, 79, 156);
+    color: #FFF;
+}
+
 .zoom2 line { stroke-width: 0.5; }
 .zoom4 line { stroke-width: 0.25; }
 .zoom8 line { stroke-width: 0.125; }
@@ -12,3 +38,7 @@ div#tools { position: absolute; top: 10px; left: 10px;}
 .zoom32 line { stroke-width: 0.05; }
 .zoom64 line { stroke-width: 0.025; }
 .zoom128 line { stroke-width: 0.025; }
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none;
+}
