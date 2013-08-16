@@ -268,10 +268,7 @@ angular.module('evemaps').directive('evemap', ['$window', 'MapsService', functio
                 is = d3.interpolate(map.zoom.scale(), scale);
 
             return function(t) {
-                map.zoom.translate([ix(t), iy(t)]);
-                map.zoom.scale(is(t));
-
-                map.zooms.onNext(map);
+                zoomMap(map, is(t), [ix(t), iy(t)]);
             };
         });
     };
