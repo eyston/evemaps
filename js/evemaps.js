@@ -216,10 +216,6 @@ angular.module('evemaps').directive('evemap', ['$window', 'MapsService', functio
             .remove();
     };
 
-    function clearSystems(map) {
-        map.element.selectAll('circle').remove();
-    };
-
     function drawSystemLabels(map, systems) {
         var ss = map.element.selectAll('text')
             .data(systems, function(s) {
@@ -240,10 +236,6 @@ angular.module('evemaps').directive('evemap', ['$window', 'MapsService', functio
 
         ss.exit()
             .remove();
-    };
-
-    function clearSystemLabels(map) {
-        map.element.selectAll('text').remove();
     };
 
     function zoomSystem(map, system) {
@@ -304,21 +296,10 @@ angular.module('evemaps').directive('evemap', ['$window', 'MapsService', functio
             map.zooms.subscribe(function(map) {
                 var bounds = viewableBounds(map);
 
-                // TODO: no point doing this when scale < 8 ...
-                var systems = systemsTree.search(bounds);
+                var systems = map.zoom.scale() > 8 ? systemsTree.search(bounds) : [];
 
-                // TODO: move this log into drawSystems / drawSystemLabels
-                if(map.zoom.scale() > 8) {
-                    drawSystems(map, systems);
-                } else {
-                    clearSystems(map);
-                }
-
-                if(map.zoom.scale() > 16) {
-                    drawSystemLabels(map, systems);
-                } else {
-                    clearSystemLabels(map);
-                }
+                drawSystems(map, systems);
+                drawSystemLabels(map, map.zoom.scale() > 16 ? systems : []);
             });
 
 
